@@ -12,10 +12,10 @@ class Document:
         self.author = author  
         self.date = date  
         self.text = text  
-        self.type = self.getType()  
+        self.type = self.getType()  # Déterminé dynamiquement par les classes filles
 
     def getType(self):
-        return "Document" 
+        return "Document"  # Type générique par défaut
 
     def __str__(self):
         return f"{self.title} by {self.author} on {self.date} ({self.type})"
@@ -23,11 +23,11 @@ class Document:
 # Classe pour les documents Reddit
 class RedditDocument(Document):
     def __init__(self, title, author, date, num_comments, text=""):
-        super().__init__(title, author, date, text)  # Appel au constructeur parent
-        self.num_comments = num_comments
+        super().__init__(title, author, date, text)  # Hérite des attributs communs de Document
+        self.num_comments = num_comments  # Nombre de commentaires sur le post
 
     def getType(self):
-        return "Reddit"  # Type spécifique pour Reddit
+        return "Reddit"  # Spécifique aux documents Reddit
 
     def __str__(self):
         return super().__str__() + f", Comments: {self.num_comments}"
@@ -35,28 +35,29 @@ class RedditDocument(Document):
 # Classe pour les documents Arxiv
 class ArxivDocument(Document):
     def __init__(self, title, authors, date, text=""):
-        super().__init__(title, authors, date, text)  # Appel au constructeur parent
-        self.authors = authors  
+        super().__init__(title, authors, date, text)  # Hérite des attributs communs de Document
+        self.authors = authors  # Liste des auteurs
 
     def getType(self):
-        return "Arxiv"  # Type spécifique pour Arxiv
+        return "Arxiv"  # Spécifique aux documents Arxiv
 
     def __str__(self):
-        authors_str = ", ".join(self.authors)
+        authors_str = ", ".join(self.authors)  # Jointure des auteurs en une chaîne
         return super().__str__() + f", Authors: {authors_str}"
 
 # Classe pour gérer un corpus de documents (Singleton)
 class Corpus:
-    _instance = None  # Instance unique pour le singleton
+    _instance = None  # Instance unique pour le Singleton
 
     def __new__(cls):
+        # Implémentation du Singleton pour assurer une seule instance
         if cls._instance is None:
             cls._instance = super(Corpus, cls).__new__(cls)
-            cls._instance.documents = []  # Initialisation de la liste
+            cls._instance.documents = []  # Initialisation de la liste des documents
         return cls._instance  
 
     def add_document(self, document):
-        self.documents.append(document)  # Ajout d'un document
+        self.documents.append(document)  # Ajout d'un document au corpus
 
     def display_documents(self):
         for doc in self.documents:
@@ -64,15 +65,16 @@ class Corpus:
 
 # Fonction de collecte des données de Reddit
 def collect_reddit_data():
-    reddit = praw.Reddit(client_id='tEQSvErg_mor-oAPoqEjlg',client_secret='FbQthefsNh8wiLCYlkAjeFx7L1VLeA',user_agent='WebScrapping')
-    hot_posts = reddit.subreddit('Coronavirus')
+    # Configuration de l'API Reddit 
+    reddit = praw.Reddit(client_id='tEQSvErg_mor-oAPoqEjlg', client_secret='FbQthefsNh8wiLCYlkAjeFx7L1VLeA', user_agent='WebScrapping')
+    hot_posts = reddit.subreddit('Coronavirus')  # Sélectionne le subreddit 'Coronavirus'
     documents = []
-    for idx, post in enumerate(hot_posts.hot(limit=100)):
-        combined_text = f"{post.title}. {post.selftext}".replace("\n", " ")
+    for idx, post in enumerate(hot_posts.hot(limit=100)):  # Récupère les 100 posts les plus populaires
+        combined_text = f"{post.title}. {post.selftext}".replace("\n", " ")  # Combine le titre et le texte du post
         doc = RedditDocument(
             title=post.title,
-            author=str(post.author) if post.author else "Inconnu",
-            date=str(datetime.datetime.fromtimestamp(post.created_utc)),
+            author=str(post.author) if post.author else "Inconnu",  
+            date=str(datetime.datetime.fromtimestamp(post.created_utc)),  # Conversion de l'horodatage en date
             num_comments=post.num_comments,
             text=combined_text
         )
@@ -81,31 +83,31 @@ def collect_reddit_data():
 
 # Fonction de collecte des données d'Arxiv
 def collect_arxiv_data():
-    query = "covid"
-    url = f'http://export.arxiv.org/api/query?search_query=all:{query}&start=0&max_results=100'
-    time.sleep(1)  # Respecter les limites de taux
+    query = "covid"  # Terme de recherche dans l'API Arxiv
+    url = f'http://export.arxiv.org/api/query?search_query=all:{query}&start=0&max_results=100'  # URL de l'API
+    time.sleep(1)  # Pause pour éviter un dépassement du taux de requêtes
 
     with urllib.request.urlopen(url) as response:
-        data = response.read()
+        data = response.read()  # Lecture des données renvoyées par l'API
 
-    parsed_data = xmltodict.parse(data)
+    parsed_data = xmltodict.parse(data)  # Conversion des données XML en dictionnaire
     documents = []
     for idx, entry in enumerate(parsed_data['feed']['entry']):
         auteur = entry['author'][0].get('name', "Inconnu") if 'author' in entry and isinstance(entry['author'], list) and entry['author'] else "Inconnu"
         doc = ArxivDocument(
             title=entry['title'],
             authors=[auteur],
-            date=entry['published'],
-            text=entry['summary'].replace("\n", " ")
+            date=entry['published'],  # Date de publication
+            text=entry['summary'].replace("\n", " ")  # Résumé du document sans sauts de ligne
         )
         documents.append(doc)
     return documents
 
 # Exemple d'utilisation
 if __name__ == "__main__":
-    corpus = Corpus()  # Création ou récupération de l'instance unique de Corpus
+    corpus = Corpus()  # Récupération de l'instance unique du Corpus
 
-    # Collecte des données
+    # Collecte des données depuis Reddit et Arxiv
     reddit_documents = collect_reddit_data()
     arxiv_documents = collect_arxiv_data()
 
@@ -118,9 +120,9 @@ if __name__ == "__main__":
 
     # Sauvegarde du corpus dans un fichier pickle
     with open("corpus.pkl", "wb") as f:
-        pickle.dump(corpus, f)
+        pickle.dump(corpus, f)  # Sérialisation et sauvegarde
 
     # Lecture du corpus depuis un fichier pickle
     with open("corpus.pkl", "rb") as f:
-        loaded_corpus = pickle.load(f)
-        loaded_corpus.display_documents()  # Affichage des documents chargés
+        loaded_corpus = pickle.load(f)  # Chargement du corpus sérialisé
+        loaded_corpus.display_documents()  # Vérification des documents chargés

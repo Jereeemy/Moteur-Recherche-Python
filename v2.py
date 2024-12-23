@@ -12,7 +12,7 @@ from datetime import datetime
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Dictionnaire pour stocker les instances de Document
-id2doc = {}
+id2doc = {} # Stocke chaque document avec un identifiant unique
 id_counter = 0
 
 reddit = praw.Reddit(
@@ -39,19 +39,19 @@ class Document:
 class RedditDocument(Document):
     def __init__(self, title, author, date, num_comments):
         super().__init__(title, author, date)  # Appel au constructeur de la classe de base
-        self.num_comments = num_comments
+        self.num_comments = num_comments # Stocke le nombre de commentaires pour un post Reddit
 
     def getType(self):
         return "Reddit"  
 
     def __str__(self):
-        return super().__str__() + f", Comments: {self.num_comments}"  
+        return super().__str__() + f", Comments: {self.num_comments}"  # Ajoute les commentaires à l'affichage
 
 # Classe pour les documents Arxiv
 class ArxivDocument(Document):
     def __init__(self, title, authors, date):
         super().__init__(title, authors, date)  # Appel au constructeur de la classe de base
-        self.authors = authors
+        self.authors = authors # Liste des auteurs pour les documents Arxiv
 
     def getType(self):
         return "Arxiv"  
