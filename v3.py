@@ -290,7 +290,7 @@ def display_results_as_table(results):
 # Création des widgets pour l'interface utilisateur
 title_label = widgets.Label(value="Moteur de Recherche de Documents")
 keyword_text = widgets.Text(description="Mot-clé:")
-num_slider = widgets.IntSlider(value=5, min=1, max=20, description="Nb Docs:")
+num_slider = widgets.IntSlider(value=5, min=1, max=100, description="Nb Docs:")
 output = widgets.Output()
 progress_label = widgets.Label(value="Barre de progression:")
 progress_bar = widgets.IntProgress(value=0, min=0, max=100, description="Progression:")
