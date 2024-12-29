@@ -1,4 +1,4 @@
-# !pip install praw
+# !pip install praw (si nécéssaire)
 import praw
 import requests
 from bs4 import BeautifulSoup
