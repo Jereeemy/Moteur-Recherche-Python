@@ -1,0 +1,13 @@
+praw
+urllib3
+xmltodict
+pandas
+numpy
+scipy
+scikit-learn
+requests
+beautifulsoup4
+nltk
+ipywidgets
+tqdm
+matplotlib
